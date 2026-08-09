@@ -141,7 +141,7 @@ jobs:
       - name: Setup Alderis Framework
         run: |
           mkdir -p $THEOS/include $THEOS/lib
-          git clone --depth=1 https://github.com/hashbang/Alderis.git /tmp/Alderis
+          git clone --depth=1 https://github.com/CharizTeam/Alderis.git /tmp/Alderis || true
           cp -r /tmp/Alderis/Alderis $THEOS/include/Alderis || true
         env:
           THEOS: ${{ github.workspace }}/theos
