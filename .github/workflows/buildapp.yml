@@ -150,11 +150,12 @@ jobs:
         id: build_package
         run: |
           cd ${{ github.workspace }}/main
+          find ${{ github.workspace }}/theos/vendor -name "AlderisSDKCompatibility.h" -exec sed -i '' '1s/^/#import <UIKit\/UIKit.h>\n/' {} +
+          find ${{ github.workspace }}/theos/vendor -name "PSTableCell.h" -exec sed -i '' '1s/^/#import <UIKit\/UIKit.h>\n/' {} +
+          find ${{ github.workspace }}/theos/vendor -name "PSSpecifier.h" -exec sed -i '' '1s/^/#import <UIKit\/UIKit.h>\n/' {} +
           sed -i '' "30s#.*#BUNDLE_ID = ${{ env.BUNDLE_ID }}#g" Makefile                          # Modify the bundle ID
           sed -i '' "29s#.*#DISPLAY_NAME = ${{ env.APP_NAME }}#g" Makefile                        # Modify the app name
           sed -i '' "1s#.*#export TARGET = iphone:clang:${{ inputs.sdk_version }}:14.0#g" Makefile # Modify the SDK version
-          export ADDITIONAL_CFLAGS="-fno-modules -include Foundation/Foundation.h -include UIKit/UIKit.h -Wno-everything"
-          export ADDITIONAL_OBJCCFLAGS="-fno-modules -include Foundation/Foundation.h -include UIKit/UIKit.h -Wno-everything"
           make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1
           echo "package=$(ls -t packages | head -n1)" >>$GITHUB_OUTPUT
           echo -e "==> \033[1mSHASUM256: $(shasum -a 256 packages/*.ipa | cut -f1 -d' ')\033[0m"
