@@ -137,7 +137,15 @@ jobs:
         env:
           THEOS: ${{ github.workspace }}/theos
           YOUTUBE_URL: ${{ env.URL_YT }}
-
+          
+      - name: Setup Alderis Framework
+        run: |
+          mkdir -p $THEOS/include $THEOS/lib
+          git clone --depth=1 https://github.com/hashbang/Alderis.git /tmp/Alderis
+          cp -r /tmp/Alderis/Alderis $THEOS/include/Alderis || true
+        env:
+          THEOS: ${{ github.workspace }}/theos
+          
       - name: Fix compiling & Build Package
         id: build_package
         run: |
@@ -145,7 +153,7 @@ jobs:
           sed -i '' "30s#.*#BUNDLE_ID = ${{ env.BUNDLE_ID }}#g" Makefile                          # Modify the bundle ID
           sed -i '' "29s#.*#DISPLAY_NAME = ${{ env.APP_NAME }}#g" Makefile                        # Modify the app name
           sed -i '' "1s#.*#export TARGET = iphone:clang:${{ inputs.sdk_version }}:14.0#g" Makefile # Modify the SDK version
-          export ADDITIONAL_CFLAGS="-Wno-error -Wno-deprecated-declarations -Wno-implicit-function-declaration"
+          export ADDITIONAL_CFLAGS="-fno-modules -Wno-error -Wno-deprecated-declarations -Wno-implicit-function-declaration"
           export ADDITIONAL_OBJCCFLAGS="-Wno-error -Wno-deprecated-declarations"
           make package THEOS_PACKAGE_SCHEME=rootless IPA=Payload/YouTube.app FINALPACKAGE=1
           echo "package=$(ls -t packages | head -n1)" >>$GITHUB_OUTPUT
